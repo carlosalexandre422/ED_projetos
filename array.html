@@ -1,29 +1,50 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Lista Sequencial</title>
   <style>
     /* Estilos básicos */
     body {
-      font-family: Arial, sans-serif;
+      font-family: Roboto;
     }
     .container {
       margin: 20px;
     }
     .list-container {
-      margin: 20px;
       display: flex;
       flex-direction: row;
       align-items: center;
     }
     .list-item {
-      width: 50px;
-      height: 50px;
-      border: 1px solid black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: inline-block;
       margin-right: 10px;
+      background-color: #8dc0e2;
+      color: white;
+      padding: 5px 10px;
+      border: 1px solid #334552;
+      border-radius: 5px;
+      transition: all, 0.3s;
+    }
+    button:hover, .list-item:hover {
+      background-color: #455c6d;
+    }
+    .arrow {
+      color: #3498db;
+      width: 20px;
+      height: 20px;
+      margin: 0 10px;
+    }
+    button{
+      background-color: #3498db;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: none;
+      margin-right: 10px;
+      transition: all, 0.3s;
+    }
+    h2{
+      color: #204158;
     }
   </style>
 </head>
@@ -34,10 +55,12 @@
     <button onclick="removerElemento()">Remover Elemento</button>
     <button onclick="consultarPorValor()">Consultar por Valor</button>
     <button onclick="consultarPorPosicao()">Consultar por Posição</button>
-  </div>
-  <div class="list-container" id="listContainer">
+    <br><br>  
+    <div class="list-container" id="listContainer">
     <!-- Lista será exibida aqui -->
+    </div>
   </div>
+
 
   <script>
     class ListaSeq {
@@ -59,7 +82,7 @@
       }
 
       elemento(pos) {
-        if (pos > this.nElementos || pos <= 0) {
+        if (pos > this.nElementos || pos <= 0 || isNaN(pos)) {
           return -1;
         }
         return this.dados[pos - 1];
@@ -75,7 +98,7 @@
       }
 
       insere(pos, valor) {
-        if (this.cheia() || pos > this.nElementos + 1 || pos <= 0) {
+        if (this.cheia() || pos > this.nElementos + 1 || pos <= 0 || isNaN(valor)) {
           return false;
         }
 
@@ -89,7 +112,7 @@
       }
 
       remove(pos) {
-        if (pos > this.nElementos || pos < 1) {
+        if (pos > this.nElementos || pos < 1 || isNaN(pos)) {
           return -1;
         }
 
@@ -108,10 +131,17 @@
 
     function renderizarLista() {
       listContainer.innerHTML = '';
+
+      const maxElement = Math.max(...lista.dados);
       for (let i = 0; i < lista.nElementos; i++) {
         const listItem = document.createElement('div');
         listItem.className = 'list-item';
-        listItem.textContent = `${i + 1} | ${lista.dados[i]}`;
+
+        // Define a largura proporcional com base no valor do elemento
+        const widthPercentage = (lista.dados[i] / maxElement) * 100;
+        listItem.style.width = `${widthPercentage}%`;
+
+        listItem.textContent = lista.dados[i];
         listContainer.appendChild(listItem);
       }
     }
@@ -123,7 +153,7 @@
       if (sucesso) {
         alert('Elemento inserido com sucesso!');
       } else {
-        alert('Inserção falhou. Verifique a posição e se a lista está cheia.');
+        alert('Inserção falhou.');
       }
       renderizarLista();
     }

@@ -5,7 +5,8 @@
   <style>
     /* Estilos básicos */
     body {
-      font-family: Arial, sans-serif;
+      font-family: Roboto;
+      display: flex;
     }
     .container {
       margin: 20px;
@@ -16,14 +17,34 @@
       align-items: center;
     }
     .list-item {
-      display: flex;
-      align-items: center;
+      display: inline-block;
       margin-right: 10px;
+      background-color: #8dc0e2;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: all, 0.3s;
+    }
+    button:hover, .list-item:hover {
+      background-color: #455c6d;
     }
     .arrow {
+      color: #3498db;
       width: 20px;
       height: 20px;
       margin: 0 10px;
+    }
+    button{
+      background-color: #3498db;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: none;
+      margin-right: 10px;
+      transition: all, 0.3s;
+    }
+    h2{
+      color: #204158;
     }
   </style>
 </head>
@@ -31,14 +52,16 @@
   <div class="container">
     <h2>Lista Duplamente Encadeada</h2>
     <button onclick="inserirElemento()">Inserir Elemento</button>
-    <button onclick="removerElemento()">Remover Elemento</button>
-    <button onclick="consultarPorValor()">Consultar por Valor</button>
-    <button onclick="consultarPorPosicao()">Consultar por Posição</button>
-    <br><br>
     <button onclick="inserirInicio()">Inserir Início</button>
     <button onclick="inserirFinal()">Inserir Final</button>
+    <br><br>
+    <button onclick="removerElemento()">Remover Elemento</button>
     <button onclick="removerInicio()">Remover Início</button>
     <button onclick="removerFinal()">Remover Final</button>
+    <br><br>
+    <button onclick="consultarPorValor()">Consultar por Valor</button>
+    <button onclick="consultarPorPosicao()">Consultar por Posição</button>
+    <br><br><br>
     <div class="list-container" id="listContainer">
       <!-- Lista será exibida aqui -->
     </div>
@@ -100,7 +123,7 @@
           return -1; // Consulta falhou
         }
 
-        if (pos < 1 || pos > this.getTamanho()) {
+        if (pos < 1 || pos > this.getTamanho() || isNaN(pos)) {
           return -1; // Posicao invalida
         }
 
@@ -116,7 +139,7 @@
         let cont = 1;
         let aux;
 
-        if (this.vazia()) {
+        if (this.vazia() || isNaN(dado)) {
           return -1;
         }
 
@@ -134,6 +157,10 @@
       }
 
       insereInicioLista(valor) {
+        if (isNaN(valor)) {
+          return false;
+        }
+
         let novoNo = new No();
         novoNo.setConteudo(valor);
         novoNo.setProx(this.inicio);
@@ -178,9 +205,13 @@
         return true;
       }
 
-      insereFimLista(dado) {
+      insereFimLista(valor) {
+        if (isNaN(valor)) {
+          return false;
+        }
+
         let novoNo = new No();
-        novoNo.setConteudo(dado);
+        novoNo.setConteudo(valor);
 
         if (this.vazia()) {
           novoNo.setProx(null);
@@ -199,7 +230,7 @@
       }
 
       insere(pos, dado) {
-        if (this.vazia() && pos !== 1) {
+        if (this.vazia() && pos !== 1 || isNaN(dado)) {
           return false; /* lista vazia mas posicao inv */
         }
 
@@ -284,7 +315,7 @@
       }
 
       remove(pos) {
-        if (this.vazia()) {
+        if (this.vazia() || isNaN(pos)) {
           return -1;
         }
 
@@ -306,20 +337,21 @@
     function renderizarLista() {
       listContainer.innerHTML = '';
       let aux = lista.inicio;
-      let elementoPosicao = 1;
       while (aux !== null) {
         const listItem = document.createElement('div');
         listItem.className = 'list-item';
-        if (elementoPosicao === 1) {
-          listItem.innerHTML = `Cabeça ↔ ${aux.getConteudo()}`;
-        } else if (aux.getProx() === null) {
-          listItem.innerHTML = `↔ Fim: ${aux.getConteudo()}`;
-        } else {
-          listItem.innerHTML = `↔ ${aux.getConteudo()}`;
-        }
+        listItem.textContent = aux.getConteudo();
         listContainer.appendChild(listItem);
+
+        // Adicione o símbolo de bi-condicional (↔) se houver um próximo elemento
+        if (aux.getProx() !== null) {
+          const arrow = document.createElement('span');
+          arrow.className = 'arrow';
+          arrow.textContent = '↔';
+          listContainer.appendChild(arrow);
+        }
+
         aux = aux.getProx();
-        elementoPosicao++;
       }
     }
 
@@ -330,7 +362,7 @@
       if (sucesso) {
         alert('Elemento inserido com sucesso!');
       } else {
-        alert('Inserção falhou. Verifique a posição.');
+        alert('Inserção falhou.');
       }
       renderizarLista();
     }
@@ -341,7 +373,7 @@
       if (valorRemovido !== -1) {
         alert(`Elemento ${valorRemovido} removido com sucesso!`);
       } else {
-        alert('Remoção falhou. Verifique a posição.');
+        alert('Remoção falhou.');
       }
       renderizarLista();
     }
@@ -403,17 +435,15 @@
         renderizarLista();
     }
 
-
     function removerFinal() {
-    const valorRemovido = lista.remove(lista.getTamanho());
-    if (valorRemovido !== -1) {
-        alert(`Elemento ${valorRemovido} removido do final com sucesso!`);
-    } else {
-        alert('Remoção do final falhou.');
+      const valorRemovido = lista.remove(lista.getTamanho());
+      if (valorRemovido !== -1) {
+          alert(`Elemento ${valorRemovido} removido do final com sucesso!`);
+      } else {
+          alert('Remoção do final falhou.');
+      }
+      renderizarLista();
     }
-    renderizarLista();
-    }
-
 
     renderizarLista(); // Renderizar a lista inicial
   </script>
